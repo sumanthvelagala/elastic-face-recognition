@@ -1,0 +1,7 @@
+boto3
+fastapi
+dotenv
+csv
+python-multipart
+uvicorn
+
