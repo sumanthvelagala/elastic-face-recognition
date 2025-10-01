@@ -6,7 +6,9 @@ This project builds an elastic cloud-based web tier application using Amazon Web
 
 Designed as the front end of a multi-tier cloud application, the web tier is implemented in Python using FastAPI and runs on a single EC2 micro instance within the US-East-1 region. For this part of the project, actual face recognition is emulated by looking up pre-populated classification data in SimpleDB rather than running a real ML model.
 
-Key features and requirements of the project include:
+Part I of this project focuses on familiarizing with AWS core IaaS resources and building foundational skills needed to develop the complete face recognition cloud platform that will be expanded in Part II.
+
+### Key features and requirements of the project include:
 
 - Handling concurrent HTTP POST requests with image uploads.
 - Storing images in a dedicated S3 input bucket named following a specific convention.
@@ -17,24 +19,25 @@ Key features and requirements of the project include:
 
 This project facilitates practical experience configuring and using core AWS IaaS services and demonstrates efficient cloud-native API design principles.
 
+---
 
-Welcome! This project sets up a cloud-based web service using FastAPI on AWS EC2. It receives image uploads from users, stores them in Amazon S3, looks up face recognition results from SimpleDB, and returns the answer. This guide walks you through launching your instance, attaching IAM roles, installing and running your server with PM2, and monitoring the process.
+## Dataset and Classification Results
 
-## Input & Output Files
+- **Face Images Dataset**: [face_images_1000.zip](https://github.com/CSE546-Cloud-Computing/CSE546-SPRING-2025/blob/datasets/face_images_1000.zip)  
+  This dataset contains the input face images that must be uploaded by the web tier to the S3 input bucket and used to populate entries in the SimpleDB domain for emulated recognition lookup.
 
-- **Input File**: [face_images_1000.zip](https://github.com/CSE546-Cloud-Computing/CSE546-SPRING-2025/blob/datasets/face_images_1000.zip)  
-  This ZIP archive contains all test face images (1000 total) for upload to the web-tier API[web:1][web:2].
+- **Classification Results File**: [classification_face_images_1000.csv](https://github.com/CSE546-Cloud-Computing/CSE546-SPRING-2025/blob/datasets/Classification%20Results%20on%20Face%20Dataset%20(1000%20images).csv)  
+  This file contains the classification results that should be used to populate the SimpleDB domain as ground truth for the face recognition emulation. The web tier queries these results from SimpleDB and returns them to clients as the recognition output.
 
-- **Output File**: [Classification Results on Face Dataset (1000 images).csv](https://github.com/CSE546-Cloud-Computing/CSE546-SPRING-2025/blob/datasets/Classification%20Results%20on%20Face%20Dataset%20(1000%20images).csv)  
-  This CSV file contains the ground truth or expected classification for each image, emulating the responses returned by the system[web:2][web:1].
-
-The input file contains face images to be uploaded for classification, and the output file contains the expected classification results as used by SimpleDB.
+---
 
 ## Why Use Both S3 and SimpleDB?
 
 - **Amazon S3** stores image files as scalable, inexpensive, and durable object storage since images are large binary data optimized for S3.
 - **Amazon SimpleDB** provides fast lookup of recognition labels with structured, key-value queries by filename.
 - Combining both leverages scalable storage with rapid, structured querying — each service performing what it does best.
+
+---
 
 ## Performance
 
@@ -92,7 +95,10 @@ pm2 start "uvicorn server:app --host 0.0.0.0 --port 8000" --interpreter=python3 
 pm2 save
 pm2 startup
 
+text
+
 Run the sudo command that PM2 outputs, e.g.:
+
 sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u ec2-user --hp /home/ec2-user
 pm2 save
 
