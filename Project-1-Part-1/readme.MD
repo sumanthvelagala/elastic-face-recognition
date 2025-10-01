@@ -20,6 +20,16 @@ This project facilitates practical experience configuring and using core AWS Iaa
 
 Welcome! This project sets up a cloud-based web service using FastAPI on AWS EC2. It receives image uploads from users, stores them in Amazon S3, looks up face recognition results from SimpleDB, and returns the answer. This guide walks you through launching your instance, attaching IAM roles, installing and running your server with PM2, and monitoring the process.
 
+## Input & Output Files
+
+- **Input File**: [face_images_1000.zip](https://github.com/CSE546-Cloud-Computing/CSE546-SPRING-2025/blob/datasets/face_images_1000.zip)  
+  This ZIP archive contains all test face images (1000 total) for upload to the web-tier API[web:1][web:2].
+
+- **Output File**: [Classification Results on Face Dataset (1000 images).csv](https://github.com/CSE546-Cloud-Computing/CSE546-SPRING-2025/blob/datasets/Classification%20Results%20on%20Face%20Dataset%20(1000%20images).csv)  
+  This CSV file contains the ground truth or expected classification for each image, emulating the responses returned by the system[web:2][web:1].
+
+The input file contains face images to be uploaded for classification, and the output file contains the expected classification results as used by SimpleDB.
+
 ## Why Use Both S3 and SimpleDB?
 
 - **Amazon S3** stores image files as scalable, inexpensive, and durable object storage since images are large binary data optimized for S3.
