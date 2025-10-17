@@ -64,63 +64,57 @@ This project facilitates practical experience configuring and using core AWS Iaa
 
 ### 3. Connect and Set Up EC2
 
-ssh -i /path/to/key.pem ec2-user@<your-elastic-ip>
-sudo yum update -y
-sudo yum install -y python3 git
-python3 -m pip install --user fastapi uvicorn boto3
+- ssh -i /path/to/key.pem ec2-user@<your-elastic-ip>
+- sudo yum update -y
+- sudo yum install -y python3 git
+- python3 -m pip install --user fastapi uvicorn boto3
 
-text
 
 ### 4. Install Node.js & PM2 for Monitoring
 
-sudo yum install -y nodejs
-sudo npm install -g pm2
+- sudo yum install -y nodejs
+- sudo npm install -g pm2
 
-text
 
 ### 5. Upload Your Code and CSV
 
 Use SCP from your local machine to upload files:
 
-scp -i /path/to/key.pem server.py ec2-user@<your-elastic-ip>:~/
-scp -i /path/to/key.pem classification_face_images_1000.csv ec2-user@<your-elastic-ip>:~/
+- scp -i </path/to/key.pem> server.py ec2-user@<your-elastic-ip>:~/
+- scp -i </path/to/key.pem> classification_face_images_1000.csv ec2-user@<your-elastic-ip>:~/
 
-text
+
 
 ### 6. Running and Persisting the FastAPI Server
 
 Start the server with PM2:
 
-pm2 start "uvicorn server:app --host 0.0.0.0 --port 8000" --interpreter=python3 --name=web-server
-pm2 save
-pm2 startup
+- pm2 start "uvicorn server:app --host 0.0.0.0 --port 8000" --interpreter=python3 --name=web-server
+- pm2 save
+- pm2 startup
 
-text
 
 Run the sudo command that PM2 outputs, e.g.:
 
-sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u ec2-user --hp /home/ec2-user
-pm2 save
+- sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u ec2-user --hp /home/ec2-user
+- pm2 save
 
-text
 
 ### 7. Monitor and Manage the Web Server
 
-pm2 list # List all servers
-pm2 logs web-server # View logs
-pm2 restart web-server # Restart server after updates
-pm2 stop web-server # Stop server
-pm2 delete web-server # Delete server process
+- pm2 list # List all servers
+- pm2 logs web-server # View logs
+- pm2 restart web-server # Restart server after updates
+- pm2 stop web-server # Stop server
+- pm2 delete web-server # Delete server process
 
-text
 
 ### 8. Testing
 
 Test your deployed API with curl:
 
-curl -X POST -F "inputFile=@test_00.jpg" http://<your-elastic-ip>:8000/
+- curl -X POST -F "inputFile=@test_00.jpg" http://<your-elastic-ip>:8000/
 
-text
 
 Expected response (plain text):
 
