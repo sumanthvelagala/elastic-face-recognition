@@ -72,8 +72,6 @@ It consists of three main tiers:
 in-bucket
 out-bucket
 
-text
-
 2. **Create SQS queues**(use desired names)
 req-queue
 resp-queue
