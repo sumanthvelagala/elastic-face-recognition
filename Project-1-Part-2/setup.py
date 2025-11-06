@@ -33,8 +33,7 @@ import boto3
 
 ec2 = boto3.client("ec2", region_name="us-east-1")
 
-# Configuration
-ami_id = "ami-060ee5998362ff0f2"        # Replace with your AMI ID
+ami_id = "ami-0ce8511a9a5f0583b"        # Replace with your AMI ID
 instance_type = "t2.micro"              # Adjust as needed
 key_name = "web-instance"                # Replace with your key pair name
 security_group_ids = ["sg-073c56e59306bf46d"]  # Replace with your security group(s)
@@ -65,7 +64,7 @@ try:
             MinCount=1,
             MaxCount=1,
             TagSpecifications=[tag_spec],
-            IamInstanceProfile={"Name": "EC2S3AccessRole"} 
+            IamInstanceProfile={"Name": "EC2S3AccessRole"}, 
         )
         instance_id = response['Instances'][0]['InstanceId']
         launched_instances.append(instance_id)

@@ -120,8 +120,6 @@ Expected response (plain text):
 
 test_00:Paul
 
-text
-
 ---
 
 ## Response Payload Example from SimpleDB

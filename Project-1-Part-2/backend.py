@@ -1,57 +1,67 @@
 import boto3
-import os
-import subprocess
+from io import BytesIO
+from face_recognition import face_match
+import time
 
-try:
-    sqs = boto3.client('sqs',region_name="us-east-1")
+sqs = boto3.client('sqs', region_name="us-east-1")
+s3 = boto3.client('s3', region_name="us-east-1")
 
-    request_url = sqs.get_queue_url(QueueName='1235578190-req-queue')['QueueUrl']
-    response_url = sqs.get_queue_url(QueueName='1235578190-resp-queue')['QueueUrl']
+request_url = sqs.get_queue_url(QueueName='1235578190-req-queue')['QueueUrl']
+response_url = sqs.get_queue_url(QueueName='1235578190-resp-queue')['QueueUrl']
 
-    s3 = boto3.client('s3',region_name="us-east-1")
-    while True:
-
-        #get request from request queue
+while True:
+    try:
+        # get request from request queue
         response = sqs.receive_message(
             QueueUrl=request_url,
-            MaxNumberOfMessages=1
-            )
+            MaxNumberOfMessages=1,
+            WaitTimeSeconds=10,
+            MessageAttributeNames=['All']
+        )
         # check if the message is still available or processed by other app-tier
         if 'Messages' not in response:
             continue
 
         message = response['Messages'][0]
-        img_nam = message["Body"]
         receipt_handle = message["ReceiptHandle"]
 
-        path = f'/home/ec2-user/images/{img_nam}'
-        
-        #download stored image from s3 to ec2 at path
-        s3.download_file(Bucket='1235578190-in-bucket',Key=img_nam,Filename=path)
+        # extract request_id and image name
+        attributes = message.get('MessageAttributes', {})
+        request_id = attributes.get('request_id', {}).get('StringValue')
+        img_nam = attributes.get('image_name', {}).get('StringValue')
 
-        #run recognition model
-        result = subprocess.run(['python3','/home/ec2-user/CSE546-FALL-2025/face_recognition.py',path],
-        cwd='/home/ec2-user/CSE546-FALL-2025',
-        capture_output=True,
-        text=True,
-        check=True)
-        predict = result.stdout
-        print(result.stderr)
+        # get image data from s3 in bytes
+        obj = s3.get_object(Bucket='1235578190-in-bucket', Key=img_nam)
+        image_bytes = obj['Body'].read()
 
-        # exclude the extension
-        image_name = img_nam.split('.')[0]
+        # run recognition model
+        name, dist = face_match(BytesIO(image_bytes), 'data.pt')
+        predict = str(name)
+
+        image_name_no_ext = img_nam.split('.')[0]
 
         # push recognition result to s3 bucket
-        s3.put_object(Bucket="1235578190-out-bucket",Key=image_name,Body=predict)
+        s3.put_object(
+            Bucket="1235578190-out-bucket",
+            Key=image_name_no_ext,
+            Body=predict
+        )
 
-        # push the recognition result to the respose queue
-        sqs.send_message(QueueUrl=response_url,MessageBody=f'{image_name}:{predict}')
+        # push the recognition result to the response queue along with request_id
+        sqs.send_message(
+            QueueUrl=response_url,
+            MessageBody=predict,
+            MessageAttributes={
+                "request_id": {
+                    "StringValue": request_id,
+                    "DataType": "String"
+                }
+            }
+        )
 
         # delete the processed message from request queue
-        sqs.delete_message(QueueUrl=request_url,ReceiptHandle=receipt_handle)
-        # delete the image stored at path
-        os.remove(path)
+        sqs.delete_message(QueueUrl=request_url, ReceiptHandle=receipt_handle)
 
-except Exception as e:
-    print(e)
-
+    except Exception as e:
+        print(e)
+        time.sleep(3)
