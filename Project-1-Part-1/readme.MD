@@ -6,6 +6,7 @@ This project builds an elastic cloud-based web tier application using Amazon Web
 
 Designed as the front end of a multi-tier cloud application, the web tier is implemented in Python using FastAPI and runs on a single EC2 micro instance within the US-East-1 region. For this part of the project, actual face recognition is emulated by looking up pre-populated classification data in SimpleDB rather than running a real ML model.
 
+## Note
 Part I of this project focuses on familiarizing with AWS core IaaS resources and building foundational skills needed to develop the complete face recognition cloud platform that will be expanded in Part II.
 
 ### Key features and requirements of the project include:
